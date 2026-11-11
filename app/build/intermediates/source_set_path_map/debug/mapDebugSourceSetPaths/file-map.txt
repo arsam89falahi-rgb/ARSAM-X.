@@ -1,7 +1,0 @@
-com.arsam.x.app-pngs-0 /data/data/com.termux/files/home/ARSAM-X/app/build/generated/res/pngs/debug
-com.arsam.x.app-resValues-1 /data/data/com.termux/files/home/ARSAM-X/app/build/generated/res/resValues/debug
-com.arsam.x.app-packageDebugResources-2 /data/data/com.termux/files/home/ARSAM-X/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
-com.arsam.x.app-packageDebugResources-3 /data/data/com.termux/files/home/ARSAM-X/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
-com.arsam.x.app-debug-4 /data/data/com.termux/files/home/ARSAM-X/app/build/intermediates/merged_res/debug/mergeDebugResources
-com.arsam.x.app-debug-5 /data/data/com.termux/files/home/ARSAM-X/app/src/debug/res
-com.arsam.x.app-main-6 /data/data/com.termux/files/home/ARSAM-X/app/src/main/res
