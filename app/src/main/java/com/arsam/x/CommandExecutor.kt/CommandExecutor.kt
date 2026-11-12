@@ -12,29 +12,37 @@ object CommandExecutor {
         return when (command.type) {
 
             CommandType.OPEN_WEBSITE -> {
-                val success = BrowserAgent.openWebsite(
-                    context,
-                    command.value
-                )
-
-                if (success) {
+                if (BrowserAgent.openWebsite(context, command.value))
                     "سایت باز شد."
-                } else {
+                else
                     "باز کردن سایت ناموفق بود."
-                }
             }
 
             CommandType.OPEN_APP -> {
-                "برای باز کردن این برنامه هنوز باید نام آن به بسته اندروید متصل شود: ${command.value}"
+                val packageName = when (command.value.lowercase()) {
+                    "روبیکا" -> "ir.rubika"
+                    "شاد" -> "ir.medu.shad"
+                    "اینستاگرام" -> "com.instagram.android"
+                    "تلگرام" -> "org.telegram.messenger"
+                    "واتساپ" -> "com.whatsapp"
+                    "یوتیوب" -> "com.google.android.youtube"
+                    else -> null
+                }
+
+                if (packageName == null) {
+                    "نام این برنامه هنوز شناخته نشده است."
+                } else if (AppController.openApp(context, packageName)) {
+                    "برنامه باز شد."
+                } else {
+                    "برنامه نصب نیست یا امکان بازکردنش وجود ندارد."
+                }
             }
 
-            CommandType.CREATE_REMINDER -> {
-                "برای یادآوری هنوز باید زمان و متن یادآوری مشخص و تأیید شود."
-            }
+            CommandType.CREATE_REMINDER ->
+                "بخش تنظیم زمان یادآوری هنوز کامل نشده است."
 
-            CommandType.UNKNOWN -> {
-                "هنوز فرمان را نمی‌شناسم. درخواستت را دقیق‌تر بنویس."
-            }
+            CommandType.UNKNOWN ->
+                "فرمان شناخته نشد."
         }
     }
 }
