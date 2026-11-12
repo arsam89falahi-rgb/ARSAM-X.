@@ -2,33 +2,37 @@ package com.arsam.x
 
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 
-class AppController(private val context: Context) {
+object AppController {
 
-    fun openApp(packageName: String): Boolean {
+    fun openApp(
+        context: Context,
+        packageName: String
+    ): Boolean {
         return try {
             val intent = context.packageManager
                 .getLaunchIntentForPackage(packageName)
+                ?: return false
 
-            if (intent != null) {
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(intent)
-                true
-            } else {
-                false
-            }
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+            true
         } catch (e: Exception) {
             false
         }
     }
 
-    fun isAppInstalled(packageName: String): Boolean {
+    fun isAppInstalled(
+        context: Context,
+        packageName: String
+    ): Boolean {
         return try {
-            context.packageManager
-                .getPackageInfo(packageName, 0)
+            context.packageManager.getApplicationInfo(
+                packageName,
+                0
+            )
             true
-        } catch (e: PackageManager.NameNotFoundException) {
+        } catch (e: Exception) {
             false
         }
     }
