@@ -2,36 +2,34 @@ package com.arsam.x
 
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
-import android.util.Log
+
+object NotificationStore {
+    @Volatile
+    var latestMessage: String = ""
+}
 
 class NotificationService : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        val notification = sbn.notification
-        val extras = notification.extras
+        val extras = sbn.notification.extras
 
-        val title = extras.getCharSequence("android.title")?.toString()
-            ?: "اعلان جدید"
+        val title = extras
+            .getCharSequence("android.title")
+            ?.toString()
+            .orEmpty()
 
-        val message = extras.getCharSequence("android.text")?.toString()
-            ?: return
+        val text = extras
+            .getCharSequence("android.text")
+            ?.toString()
+            .orEmpty()
 
-        val packageName = sbn.packageName
-
-        val allowedApps = setOf(
-            "ir.rubika",
-            "ir.medu.shad"
-        )
-
-        if (packageName in allowedApps) {
-            Log.d(
-                "ARSAM_X",
-                "برنامه: $packageName | فرستنده: $title | پیام: $message"
-            )
+        if (title.isNotBlank() || text.isNotBlank()) {
+            NotificationStore.latestMessage =
+                "برنامه: ${sbn.packageName}\nعنوان: $title\nپیام: $text"
         }
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
-        Log.d("ARSAM_X", "اعلان حذف شد")
+        // اعلان حذف‌شده نادیده گرفته می‌شود.
     }
 }
