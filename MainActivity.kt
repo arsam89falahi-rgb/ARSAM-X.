@@ -4,11 +4,7 @@ import android.app.Activity
 import android.os.Bundle
 import android.graphics.Color
 import android.view.Gravity
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.EditText
-import android.widget.Button
-import android.widget.ScrollView
+import android.widget.*
 
 class MainActivity : Activity() {
 
@@ -23,7 +19,6 @@ class MainActivity : Activity() {
     }
 
     private fun createInterface() {
-
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
@@ -39,7 +34,7 @@ class MainActivity : Activity() {
         }
 
         statusText = TextView(this).apply {
-            text = "وضعیت: آماده دریافت درخواست"
+            text = "آماده دریافت فرمان"
             textSize = 16f
             setTextColor(Color.GREEN)
             gravity = Gravity.CENTER
@@ -50,33 +45,30 @@ class MainActivity : Activity() {
             text = "سلام! من ARSAM X هستم."
             textSize = 18f
             setTextColor(Color.WHITE)
-            gravity = Gravity.CENTER
             setPadding(10, 20, 10, 20)
         }
 
-        val scrollView = ScrollView(this).apply {
+        val scroll = ScrollView(this).apply {
             addView(responseText)
         }
 
         inputText = EditText(this).apply {
-            hint = "درخواستت را بنویس..."
+            hint = "فرمان خود را بنویس..."
             setTextColor(Color.WHITE)
             setHintTextColor(Color.LTGRAY)
-            textSize = 16f
         }
 
         sendButton = Button(this).apply {
-            text = "ارسال درخواست"
-
+            text = "اجرا"
             setOnClickListener {
-                sendMessage()
+                executeRequest()
             }
         }
 
         layout.addView(title)
         layout.addView(statusText)
         layout.addView(
-            scrollView,
+            scroll,
             LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 0,
@@ -89,23 +81,33 @@ class MainActivity : Activity() {
         setContentView(layout)
     }
 
-    private fun sendMessage() {
-
+    private fun executeRequest() {
         val message = inputText.text.toString().trim()
-
         if (message.isEmpty()) return
 
         inputText.text.clear()
         sendButton.isEnabled = false
+        statusText.text = "در حال پردازش..."
 
-        statusText.text = "در حال پردازش درخواست..."
-        responseText.text = "در حال دریافت پاسخ..."
+        val command = CommandProcessor.process(message)
 
-        AIService.sendMessage(message) { reply ->
+        if (command.type != CommandType.UNKNOWN) {
+            try {
+                val result = CommandExecutor.execute(this, command)
+                responseText.text = result
+                statusText.text = "فرمان پردازش شد"
+            } catch (e: Exception) {
+                responseText.text = "خطا: ${e.message}"
+                statusText.text = "خطا در اجرای فرمان"
+            }
 
-            responseText.text = reply
-            statusText.text = "وضعیت: آماده"
             sendButton.isEnabled = true
+        } else {
+            AIService.sendMessage(message) { reply ->
+                responseText.text = reply
+                statusText.text = "آماده"
+                sendButton.isEnabled = true
+            }
         }
     }
 }
