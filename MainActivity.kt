@@ -1,140 +1,111 @@
 package com.arsam.x
 
-import android.app.*
-import android.os.*
-import android.content.*
-import android.speech.RecognizerIntent
-import android.speech.tts.TextToSpeech
-import android.widget.*
+import android.app.Activity
+import android.os.Bundle
 import android.graphics.Color
-import java.util.*
+import android.view.Gravity
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.EditText
+import android.widget.Button
+import android.widget.ScrollView
 
-class MainActivity : Activity(), TextToSpeech.OnInitListener {
+class MainActivity : Activity() {
 
-    private lateinit var tts: TextToSpeech
-    private lateinit var chat: LinearLayout
-    private lateinit var input: EditText
+    private lateinit var statusText: TextView
+    private lateinit var inputText: EditText
+    private lateinit var responseText: TextView
+    private lateinit var sendButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        tts = TextToSpeech(this, this)
+        createInterface()
+    }
 
-        val root = LinearLayout(this)
-        root.orientation = LinearLayout.VERTICAL
-        root.setPadding(20, 25, 20, 20)
-        root.setBackgroundColor(Color.rgb(10, 11, 15))
+    private fun createInterface() {
 
-        val title = TextView(this)
-        title.text = "ARSAM X"
-        title.textSize = 28f
-        title.setTextColor(Color.rgb(240, 195, 75))
-        title.gravity = 17
-        root.addView(title)
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            setPadding(24, 35, 24, 25)
+            setBackgroundColor(Color.rgb(12, 20, 38))
+        }
 
-        chat = LinearLayout(this)
-        chat.orientation = LinearLayout.VERTICAL
+        val title = TextView(this).apply {
+            text = "ARSAM X"
+            textSize = 32f
+            setTextColor(Color.CYAN)
+            gravity = Gravity.CENTER
+        }
 
-        val scroll = ScrollView(this)
-        scroll.addView(chat)
-        root.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
+        statusText = TextView(this).apply {
+            text = "وضعیت: آماده دریافت درخواست"
+            textSize = 16f
+            setTextColor(Color.GREEN)
+            gravity = Gravity.CENTER
+            setPadding(10, 20, 10, 20)
+        }
 
-        input = EditText(this)
-        input.hint = "پیامت را بنویس"
-        root.addView(input)
+        responseText = TextView(this).apply {
+            text = "سلام! من ARSAM X هستم."
+            textSize = 18f
+            setTextColor(Color.WHITE)
+            gravity = Gravity.CENTER
+            setPadding(10, 20, 10, 20)
+        }
 
-        val send = Button(this)
-        send.text = "ارسال"
-        send.setOnClickListener {
-            val text = input.text.toString()
-            if (text.isNotBlank()) {
-                addMessage("تو: $text")
-                val response = answer(text)
-                addMessage("ARSAM X: $response")
-                input.text.clear()
-                tts.speak(response, TextToSpeech.QUEUE_FLUSH, null, "arsam")
+        val scrollView = ScrollView(this).apply {
+            addView(responseText)
+        }
+
+        inputText = EditText(this).apply {
+            hint = "درخواستت را بنویس..."
+            setTextColor(Color.WHITE)
+            setHintTextColor(Color.LTGRAY)
+            textSize = 16f
+        }
+
+        sendButton = Button(this).apply {
+            text = "ارسال درخواست"
+
+            setOnClickListener {
+                sendMessage()
             }
         }
-        root.addView(send)
 
-        val voice = Button(this)
-        voice.text = "🎙 فرمان صوتی"
-        voice.setOnClickListener { startVoice() }
-        root.addView(voice)
-
-        val alarm = Button(this)
-        alarm.text = "⏰ تنظیم آلارم ساعت ۷"
-        alarm.setOnClickListener {
-            val intent = Intent(android.provider.AlarmClock.ACTION_SET_ALARM)
-            intent.putExtra(android.provider.AlarmClock.EXTRA_HOUR, 7)
-            intent.putExtra(android.provider.AlarmClock.EXTRA_MINUTES, 0)
-            startActivity(intent)
-        }
-        root.addView(alarm)
-
-        setContentView(root)
-        addMessage("سلام! من ARSAM X هستم.")
-    }
-
-    private fun addMessage(text: String) {
-        val view = TextView(this)
-        view.text = text
-        view.textSize = 16f
-        view.setTextColor(Color.WHITE)
-        view.setPadding(12, 14, 12, 14)
-        chat.addView(view)
-    }
-
-    private fun answer(text: String): String {
-        val t = text.lowercase(Locale.ROOT)
-        return when {
-            t.contains("سلام") -> "سلام! آماده‌ام کمکت کنم."
-            t.contains("اسمت") -> "من ARSAM X هستم."
-            t.contains("جوک") -> "چرا کامپیوتر مریض شد؟ چون ویروس گرفته بود!"
-            t.contains("خداحافظ") -> "خداحافظ!"
-            else -> "این قابلیت هنوز اضافه نشده است."
-        }
-    }
-
-    private fun startVoice() {
-        try {
-            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "fa-IR")
-            intent.putExtra(
-                RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+        layout.addView(title)
+        layout.addView(statusText)
+        layout.addView(
+            scrollView,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                0,
+                1f
             )
-            startActivityForResult(intent, 100)
-        } catch (e: Exception) {
-            addMessage("تشخیص گفتار در دسترس نیست.")
-        }
+        )
+        layout.addView(inputText)
+        layout.addView(sendButton)
+
+        setContentView(layout)
     }
 
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?
-    ) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 100 && resultCode == RESULT_OK) {
-            val result = data?.getStringArrayListExtra(
-                RecognizerIntent.EXTRA_RESULTS
-            )
-            val text = result?.firstOrNull() ?: return
-            addMessage("تو: $text")
-            val response = answer(text)
-            addMessage("ARSAM X: $response")
-            tts.speak(response, TextToSpeech.QUEUE_FLUSH, null, "arsam")
-        }
-    }
+    private fun sendMessage() {
 
-    override fun onInit(status: Int) {
-        if (status == TextToSpeech.SUCCESS) {
-            tts.language = Locale("fa", "IR")
-        }
-    }
+        val message = inputText.text.toString().trim()
 
-    override fun onDestroy() {
-        tts.shutdown()
-        super.onDestroy()
+        if (message.isEmpty()) return
+
+        inputText.text.clear()
+        sendButton.isEnabled = false
+
+        statusText.text = "در حال پردازش درخواست..."
+        responseText.text = "در حال دریافت پاسخ..."
+
+        AIService.sendMessage(message) { reply ->
+
+            responseText.text = reply
+            statusText.text = "وضعیت: آماده"
+            sendButton.isEnabled = true
+        }
     }
 }
