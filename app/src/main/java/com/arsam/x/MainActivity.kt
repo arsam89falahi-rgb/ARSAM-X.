@@ -4,86 +4,59 @@ import android.app.Activity
 import android.os.Bundle
 import android.graphics.Color
 import android.view.Gravity
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.EditText
-import android.widget.Button
+import android.widget.*
 
 class MainActivity : Activity() {
-
-    private lateinit var statusText: TextView
-    private lateinit var inputText: EditText
-    private lateinit var responseText: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        try {
-            createInterface()
-        } catch (e: Exception) {
-            statusText = TextView(this)
-            statusText.text = "خطا در اجرای ARSAM X:\n${e.message}"
-            setContentView(statusText)
-        }
-    }
+        val layout = LinearLayout(this)
+        layout.orientation = LinearLayout.VERTICAL
+        layout.gravity = Gravity.CENTER
+        layout.setPadding(24, 40, 24, 40)
+        layout.setBackgroundColor(Color.rgb(12, 20, 38))
 
-    private fun createInterface() {
+        val title = TextView(this)
+        title.text = "ARSAM X"
+        title.textSize = 32f
+        title.setTextColor(Color.CYAN)
+        title.gravity = Gravity.CENTER
 
-        val layout = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER
-            setPadding(28, 40, 28, 28)
-            setBackgroundColor(Color.rgb(12, 20, 38))
-        }
+        val status = TextView(this)
+        status.text = "برنامه با موفقیت اجرا شد"
+        status.textSize = 18f
+        status.setTextColor(Color.GREEN)
+        status.gravity = Gravity.CENTER
+        status.setPadding(10, 30, 10, 30)
 
-        val title = TextView(this).apply {
-            text = "ARSAM X"
-            textSize = 32f
-            setTextColor(Color.CYAN)
-            gravity = Gravity.CENTER
-        }
+        val input = EditText(this)
+        input.hint = "درخواستت را بنویس"
+        input.setTextColor(Color.WHITE)
+        input.setHintTextColor(Color.LTGRAY)
 
-        statusText = TextView(this).apply {
-            text = "وضعیت: برنامه اجرا شده است"
-            textSize = 16f
-            setTextColor(Color.GREEN)
-            gravity = Gravity.CENTER
-            setPadding(10, 25, 10, 25)
-        }
+        val button = Button(this)
+        button.text = "ارسال درخواست"
 
-        responseText = TextView(this).apply {
-            text = "سلام! من ARSAM X هستم."
-            textSize = 18f
-            setTextColor(Color.WHITE)
-            gravity = Gravity.CENTER
-            setPadding(10, 20, 10, 20)
-        }
+        val response = TextView(this)
+        response.text = "سلام! من ARSAM X هستم."
+        response.textSize = 18f
+        response.setTextColor(Color.WHITE)
 
-        inputText = EditText(this).apply {
-            hint = "درخواستت را بنویس..."
-            setTextColor(Color.WHITE)
-            setHintTextColor(Color.LTGRAY)
-            textSize = 16f
-        }
+        button.setOnClickListener {
+            val message = input.text.toString().trim()
 
-        val sendButton = Button(this).apply {
-            text = "ارسال درخواست"
-            setOnClickListener {
-                val message = inputText.text.toString().trim()
-
-                if (message.isNotEmpty()) {
-                    responseText.text =
-                        "درخواست دریافت شد:\n$message\n\nموتور هوش مصنوعی هنوز متصل نشده است."
-                    inputText.text.clear()
-                }
+            if (message.isNotEmpty()) {
+                response.text = "درخواست دریافت شد:\n$message"
+                input.text.clear()
             }
         }
 
         layout.addView(title)
-        layout.addView(statusText)
-        layout.addView(responseText)
-        layout.addView(inputText)
-        layout.addView(sendButton)
+        layout.addView(status)
+        layout.addView(input)
+        layout.addView(button)
+        layout.addView(response)
 
         setContentView(layout)
     }
