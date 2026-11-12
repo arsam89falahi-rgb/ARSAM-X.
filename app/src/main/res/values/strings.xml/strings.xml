@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ARSAM X</string>
+    <string name="accessibility_service_description">
+        ARSAM X با اجازه شما برای تعامل با رابط کاربری گوشی استفاده می‌شود.
+    </string>
+</resources>
